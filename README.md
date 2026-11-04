@@ -226,24 +226,29 @@ The project runtime (`node`), native Yarn package and graph inspector
 ```
 
 `selectedYarn` and `projectNode` are caller-provided Nix packages. Yarn may run
-on a different Node than the project. A script shell keeps the selected target
+on a different Node than the project. When overriding command wrappers, set
+`yarnNode` to Yarn’s runtime as well as `nodejs` to the project runtime; older
+Yarn root lifecycle hooks need both roles in PATH. A script shell keeps the selected target
 on PATH even when Yarn inserts its own Node proxy. Native-addon headers come
 from that target. Modern graph tooling only inspects the installed result;
 Yarn retains resolution and lifecycle behavior. `runtimeGraph/graph.json`
 records the target version/ABI/platform separately from the helper runtime.
 
 Regression points include Node 0.12.18 with Yarn 1.10.1 running on Node 4.9.1,
-Node 4.9.1 with Yarn 1.10.1, Node 12.22.12 with Yarn 1.22.22, and the pinned
-Node 26.1.0-rc.0 with Yarn 1.22.22. These points establish fixture behavior;
-they do not restrict user versions or prove every intervening release. Node
-0.12 is currently exercised only on x86_64 Linux. Other points have checks for
-both Linux architectures; execution evidence is recorded per system.
+Node 4.9.1 with Yarn 1.10.1, and Yarn 1.22.22 with Node 6.17.1, 8.17.0,
+10.24.1, 12.22.12, 14.21.3, 16.20.2, 18.20.8, 20.19.0, 22.14.0, and
+26.0.0. These exact points check native lock/prefetch, offline workspace
+install/build/test, byte-equal publication, and ordinary registry installation
+and execution of the prepared outgoing graph. They do not restrict user
+versions or prove every intervening release. Node 0.12 is exercised only on
+x86_64 Linux; CI includes both Linux architectures for the other points.
+The separate Node 26.1.0-rc.0 fixture checks pure build/scripts and outgoing
+packaging; it does not establish native prerelease workflows.
 
 `legacy-node-addon` additionally builds an N-API addon using Node 12 headers,
 runs it on Node 12, and installs its outgoing artifact in an ordinary offline
-npm 6 consumer. This does not establish old node-gyp or V8 C++ API compatibility.
-`tests/legacy-native.py` checks Node 12 lock/prefetch/offline install and
-workspace build/test without changing project source files.
+npm 6 consumer. This does not establish old node-gyp or V8 C++ API compatibility,
+or addon compatibility for the other Node points.
 
 ### One-off builds without a project Nix file
 
