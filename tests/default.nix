@@ -906,6 +906,11 @@ in
     scope = withOverlay.yarn-classic-purifier;
   };
   legacy-node = import ./legacy-node.nix { inherit pkgs buildYarnClassicProject; };
+  legacy-node-4-tools = import ./legacy-tools.nix {
+    inherit pkgs;
+    scope = withOverlay.yarn-classic-purifier;
+    version = "4.9.1";
+  };
   legacy-node-4 = import ./legacy-node.nix {
     inherit pkgs buildYarnClassicProject;
     version = "4.9.1";
@@ -918,9 +923,68 @@ in
   };
 }
 // lib.optionalAttrs (pkgs.stdenv.hostPlatform.system == "x86_64-linux") {
+  legacy-node-0-tools = import ./legacy-tools.nix {
+    inherit pkgs;
+    scope = withOverlay.yarn-classic-purifier;
+    version = "0.12.18";
+  };
   legacy-node-0 = import ./legacy-node.nix {
     inherit pkgs buildYarnClassicProject;
     version = "0.12.18";
     abi = "14";
   };
 }
+
+// lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux (
+  let
+    points = {
+      "6" = {
+        version = "6.17.1";
+        abi = "48";
+      };
+      "8" = {
+        version = "8.17.0";
+        abi = "57";
+      };
+      "10" = {
+        version = "10.24.1";
+        abi = "64";
+      };
+      "14" = {
+        version = "14.21.3";
+        abi = "83";
+      };
+      "16" = {
+        version = "16.20.2";
+        abi = "93";
+      };
+      "18" = {
+        version = "18.20.8";
+        abi = "108";
+      };
+      "20" = {
+        version = "20.19.0";
+        abi = "115";
+      };
+      "22" = {
+        version = "22.14.0";
+        abi = "127";
+      };
+      "26" = {
+        version = "26.0.0";
+        abi = "147";
+      };
+    };
+  in
+  lib.concatMapAttrs (major: point: {
+    "node-lts-${major}" = import ./legacy-node.nix {
+      inherit pkgs buildYarnClassicProject;
+      inherit (point) version abi;
+    };
+    "node-lts-${major}-tools" = import ./legacy-tools.nix {
+      inherit pkgs;
+      scope = withOverlay.yarn-classic-purifier;
+      inherit (point) version;
+    };
+  }) points
+)

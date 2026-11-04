@@ -37,7 +37,10 @@ let
 in
 pkgs.runCommand "yarn-classic-node-${version}"
   {
-    passthru = { inherit (project) release runtimeGraph; };
+    passthru = {
+      inherit (project) release runtimeGraph;
+      repository = project.projections.npm;
+    };
     nativeBuildInputs = [
       project.packages.legacy-app
       pkgs.python3

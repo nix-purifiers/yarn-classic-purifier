@@ -58,6 +58,8 @@
   # Yarn Classic from nixpkgs. Inside this flake's package scope the name
   # `yarn` is the offline wrapper, so the argument has another name.
   yarnClassic ? pkgs.yarn,
+  # Runtime of Yarn itself when it differs from the project runtime.
+  yarnNode ? nodejs,
 }:
 let
   scriptShell = writeShellScript "yarn-project-script-shell" ''
@@ -79,6 +81,10 @@ writeShellApplication {
     nodejs
   ];
   text = ''
+    # Older Yarn prepends its interpreter only when absent from PATH.
+    # Keep it after the project runtime so root lifecycle scripts use the target.
+    export PATH="$PATH":${yarnNode}/bin
+    export NODE=${nodejs}/bin/node
     export YARN_SCRIPT_SHELL=${scriptShell}
     if [ "''${YARN_CLASSIC_PURIFIER_REENTER:-0}" != 1 ]; then
       exec ${python3}/bin/python ${../../tools}/composition.py \

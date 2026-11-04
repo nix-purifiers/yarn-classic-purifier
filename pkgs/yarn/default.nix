@@ -32,6 +32,8 @@
   # Yarn Classic from nixpkgs. Inside this flake's package scope the name
   # `yarn` is this wrapper, so the argument has another name.
   yarnClassic ? pkgs.yarn,
+  # Runtime of Yarn itself when it differs from the project runtime.
+  yarnNode ? nodejs,
 }:
 let
   scriptShell = writeShellScript "yarn-project-script-shell" ''
@@ -60,7 +62,12 @@ writeShellApplication {
         --tools ${purifier.projectInputsTool} -- "$@"
     fi
 
+    # Older Yarn prepends its interpreter only when absent from PATH.
+    # Keep it after the project runtime so root lifecycle scripts use the target.
+    export PATH="$PATH":${yarnNode}/bin
+    export NODE=${nodejs}/bin/node
     yarn=${lib.getExe yarnClassic}
+    export YARN_SCRIPT_SHELL=${scriptShell}
     if [ "''${YARN_CLASSIC_PURIFIER_NATIVE_CONTEXT:-0}" = 1 ]; then
       exec "$yarn" --offline "$@"
     fi
@@ -68,7 +75,6 @@ writeShellApplication {
     if [ "''${YARN_CLASSIC_PURIFIER:-1}" = 0 ]; then
       exec "$yarn" "$@"
     fi
-    export YARN_SCRIPT_SHELL=${scriptShell}
 
     # The first argument that is not an option is Yarn's command.
     command=
