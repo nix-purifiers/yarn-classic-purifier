@@ -145,6 +145,10 @@ let
       }).problems;
 in
 {
+  browser-projections = import ./browser-projections.nix {
+    inherit pkgs;
+    build = buildYarnClassicProject;
+  };
   archive-timestamps =
     pkgs.runCommand "yarn-archive-timestamps" { nativeBuildInputs = [ pkgs.python3 ]; }
       ''
