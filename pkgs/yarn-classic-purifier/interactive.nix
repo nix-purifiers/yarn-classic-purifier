@@ -17,7 +17,7 @@
   lockFile ? null,
 }:
 let
-  nativeLock = import ./lock.nix {
+  nativeLock = import ../../lib-overlays/default/lock.nix {
     inherit (pkgs) lib;
     inherit yarnLock lockFile;
   };
@@ -30,7 +30,7 @@ let
     inherit (nativeLock) problems;
   };
 in
-pkgs.callPackage ./offline-mirror.nix {
+pkgs.callPackage ../build-yarn-classic-project/offline-mirror.nix {
   downloads = purifier.entriesFor pkgs.stdenv.hostPlatform.system lock;
   inherit purifier node yarn;
 }

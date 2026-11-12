@@ -63,7 +63,7 @@ let
   # the given packages, or with none.
   readLock =
     text: packages:
-    import ../nix/lib/lock.nix {
+    import ../lib-overlays/default/lock.nix {
       inherit lib;
       yarnLock = builtins.toFile "yarn.lock" text;
       lockFile = if packages == null then null else toLockFile (lockFor text packages);
@@ -84,7 +84,7 @@ let
   # `yarn-classic-purifier prefetch` builds it.
   mirrorOf =
     yarnLock: lockFile:
-    import ../nix/lib/interactive.nix {
+    import ../pkgs/yarn-classic-purifier/interactive.nix {
       inherit
         pkgs
         purifier
@@ -110,7 +110,7 @@ let
                 hash = lib.fakeHash;
                 prepare = true;
                 downloads =
-                  (import ../nix/lib/lock.nix {
+                  (import ../lib-overlays/default/lock.nix {
                     inherit lib;
                     yarnLock = ./fixtures/git-prepare/repository/yarn.lock;
                   }).downloads;
@@ -263,7 +263,7 @@ in
       digest = builtins.hashString "sha256" (
         lib.concatMapStrings builtins.readFile [
           ../pkgs/yarn-classic-purifier/default.nix
-          ../nix/lib/lock.nix
+          ../lib-overlays/default/lock.nix
           ./fixtures/relock/package.json
           ./fixtures/relock/yarn.lock
           ./fixtures/relock/yarn-classic-purifier.lock.json
@@ -324,8 +324,8 @@ in
       digest = builtins.hashString "sha256" (
         lib.concatMapStrings builtins.readFile [
           ../pkgs/yarn-classic-purifier/default.nix
-          ../nix/lib/lock.nix
-          ../nix/lib/read-lock.nix
+          ../lib-overlays/default/lock.nix
+          ../lib-overlays/default/read-lock.nix
           ./fixtures/update/package.json
           ./fixtures/update/yarn.lock
           ./fixtures/update/yarn-classic-purifier.lock.json
@@ -357,7 +357,7 @@ in
           exit 1
         fi
         problems="$(nix eval --impure --json --expr '
-          (import ${../nix/lib}/read-lock.nix { lib = import ${pkgs.path}/lib; } {
+          (import ${../lib-overlays/default}/read-lock.nix { lib = import ${pkgs.path}/lib; } {
             src = /. + builtins.getEnv "PWD";
           }).problems
         ')"
@@ -384,7 +384,7 @@ in
     cd project
     mkdir .yarn-classic-purifier
     ln -s ${appMirror} .yarn-classic-purifier/mirror
-    ${import ../nix/lib/mirror-script.nix {
+    ${import ../pkgs/yarn-classic-purifier/mirror-script.nix {
       flake = ../.;
       nixpkgs = pkgs.path;
       node = pkgs.nodejs;
@@ -481,7 +481,7 @@ in
         fi
         grep -q 'is not valid JSON. Run `yarn-classic-purifier lock`' prefetch.log
         if nix eval --impure --expr '
-          (import ${../nix/lib}/read-lock.nix { lib = import ${pkgs.path}/lib; } {
+          (import ${../lib-overlays/default}/read-lock.nix { lib = import ${pkgs.path}/lib; } {
             src = /. + builtins.getEnv "PWD";
           }).problems
         ' 2> eval.log; then
@@ -584,7 +584,7 @@ in
   # fixture's yarn.lock.
   fetches = evalCheck "fetches" (
     map (e: e.path) app.fetches == map (e: e.path)
-      (import ../nix/lib/lock.nix {
+      (import ../lib-overlays/default/lock.nix {
         inherit lib;
         yarnLock = ./fixtures/app/yarn.lock;
       }).downloads
@@ -813,10 +813,10 @@ in
     '';
 
   # `yarn-classic-purifier publish` uploads the package's tarball from the
-  # release, which nix/lib/publish.nix links as package.tgz.
+  # release, which pkgs/yarn-classic-purifier/publish.nix links as package.tgz.
   publish-tarball =
     let
-      tarball = import ../nix/lib/publish.nix {
+      tarball = import ../pkgs/yarn-classic-purifier/publish.nix {
         pkgs = withOverlay;
         src = ./fixtures/app;
         package = "hello-yarn";

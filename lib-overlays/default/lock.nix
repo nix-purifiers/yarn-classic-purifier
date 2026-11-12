@@ -16,7 +16,7 @@
 #               carries `downloads`, the mirror of the repository's own
 #               yarn.lock, and `yarnLock`, the text of that yarn.lock, when
 #               the repository has none and the lock command resolved one.
-#               nix/lib/offline-mirror.nix turns each git entry into the
+#               pkgs/build-yarn-classic-project/offline-mirror.nix turns each git entry into the
 #               tarball Yarn reads from the mirror.
 #   missing     each locked package that needs an entry in the purifier
 #               lockfile and has none, as { resolved, url } for a tarball
