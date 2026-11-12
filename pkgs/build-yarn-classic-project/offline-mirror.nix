@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
 #
-# Yarn's offline mirror for the downloads of nix/lib/lock.nix: a tree of
+# Yarn's offline mirror for the downloads of lib-overlays/default/lock.nix: a tree of
 # links, each at the file name Yarn looks the package up by.
 #
 # The shared purifier library fetches the entries. A file entry is a

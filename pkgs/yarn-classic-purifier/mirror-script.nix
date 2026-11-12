@@ -13,7 +13,7 @@
 # file.
 #
 # `buildMirror <yarn.lock> <purifier lockfile>` builds the offline mirror
-# of nix/lib/interactive.nix at `mirror` in the roots directory, unless the
+# of pkgs/yarn-classic-purifier/interactive.nix at `mirror` in the roots directory, unless the
 # mirror there was built from the same two lockfiles. The purifier lockfile
 # may be absent. The file `lock.sha256` in the roots directory records the
 # SHA-256 of the lockfiles the mirror was built from.
@@ -64,7 +64,7 @@
     fi
     YARN_CLASSIC_PURIFIER_LOCK="$1" YARN_CLASSIC_PURIFIER_PURIFIER_LOCK="$2" \
       nix build --impure --out-link "$roots/mirror" --expr "
-        import ${flake}/nix/lib/interactive.nix {
+        import ${flake}/pkgs/yarn-classic-purifier/interactive.nix {
           purifier = (builtins.getFlake \"path:${flake}\").lib.purifier;
           pkgs = import ${nixpkgs} { system = \"${system}\"; };
           node = ${(import ./sdk-expression.nix node).shell};

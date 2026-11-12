@@ -183,7 +183,7 @@ attributes:
 The builder takes `src`, the root of the project, `lockFile`, the purifier
 lockfile, and `yarnLock`, Yarn's lockfile. The defaults are the files in
 `src`. It also takes the arguments that
-`nix/lib/build-yarn-classic-project.nix` documents: `buildScripts`
+`pkgs/build-yarn-classic-project/default.nix` documents: `buildScripts`
 (`[ "build" ]` by default), `testScripts` (`[ "test" ]` by default), `node`,
 `nativeBuildInputs`, `buildInputs` and `srcFilter`. The argument `fetchers`
 replaces fetchers of the purifier library. A `fetchurl` that sends

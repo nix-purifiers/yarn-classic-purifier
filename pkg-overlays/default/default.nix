@@ -4,7 +4,7 @@
 # the scope `pkgs.yarn-classic-purifier`, made with lib.makeScope. The scope
 # holds the packages of pkgs/ (`.yarn`, the offline wrapper, and
 # `.yarn-classic-purifier`, the command) and the builder
-# `.buildYarnClassicProject` (nix/lib/build-yarn-classic-project.nix), a
+# `.buildYarnClassicProject` (pkgs/build-yarn-classic-project/default.nix), a
 # package for callPackage in that scope. `.overrideScope` replaces what
 # everything in the scope shares, `.buildYarnClassicProject.override`
 # replaces what the builder takes, and a package written for callPackage
@@ -28,7 +28,7 @@ in
           inherit (closure-lib) purifier;
           # The scope's own `yarn` is the offline wrapper, so the builder
           # takes Yarn Classic from nixpkgs explicitly.
-          buildYarnClassicProject = self.callPackage ../../nix/lib/build-yarn-classic-project.nix {
+          buildYarnClassicProject = self.callPackage ../../pkgs/build-yarn-classic-project/default.nix {
             inherit (final) yarn;
             inherit (closure-lib) purifier;
           };

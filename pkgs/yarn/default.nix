@@ -3,7 +3,7 @@
 # Yarn Classic, wrapped so that in a project with a yarn.lock it installs
 # the locked tarballs from the Nix store, offline. The wrapper builds the
 # lockfile's tarballs into an offline mirror through Nix
-# (nix/lib/interactive.nix), under .yarn-classic-purifier in the project,
+# (pkgs/yarn-classic-purifier/interactive.nix), under .yarn-classic-purifier in the project,
 # and runs Yarn offline against that mirror. It rebuilds the mirror when a
 # lockfile changes; after `yarn-classic-purifier prefetch` it needs no
 # network.
@@ -107,7 +107,7 @@ writeShellApplication {
         ;;
     esac
 
-    ${import ../../nix/lib/mirror-script.nix {
+    ${import ../yarn-classic-purifier/mirror-script.nix {
       flake = ../..;
       nixpkgs = path;
       node = nodejs;

@@ -12,7 +12,7 @@
 # the offline mirror of the repository's own yarn.lock, found the same way.
 # The file also holds its format `version`, the `inputsHash` of yarn.lock
 # and its own `contentHash`. The command reads yarn.lock with the reader a
-# build uses (nix/lib/lock.nix), and removes the file when nothing needs it.
+# build uses (lib-overlays/default/lock.nix), and removes the file when nothing needs it.
 #
 # `yarn-classic-purifier update [<package>...]` re-resolves the named
 # packages, or all of them, with `yarn upgrade`, within the ranges that
@@ -160,7 +160,7 @@ writeShellApplication {
     toolLock="$(realpath -m "''${toolLockGiven:-$dir/yarn.lock}")"
     pkgs='import ${path} { system = "${stdenv.hostPlatform.system}"; }'
 
-    ${import ../../nix/lib/mirror-script.nix {
+    ${import ./mirror-script.nix {
       flake = ../..;
       nixpkgs = path;
       node = nodejs;
@@ -168,7 +168,7 @@ writeShellApplication {
       inherit (stdenv.hostPlatform) system;
     }}
 
-    # Prints attribute $2 of what nix/lib/lock.nix reads from yarn.lock $1,
+    # Prints attribute $2 of what lib-overlays/default/lock.nix reads from yarn.lock $1,
     # with purifier lockfile $3 when it is given.
     readLock() {
       local purifier=null
@@ -177,7 +177,7 @@ writeShellApplication {
       fi
       YARN_CLASSIC_PURIFIER_LOCK="$1" YARN_CLASSIC_PURIFIER_PURIFIER_LOCK="''${3:-}" \
         nix eval --impure --json --expr "
-          (import ${../../nix/lib}/lock.nix {
+          (import ${../../lib-overlays/default}/lock.nix {
             inherit ($pkgs) lib;
             yarnLock = /. + builtins.getEnv \"YARN_CLASSIC_PURIFIER_LOCK\";
             lockFile = $purifier;
@@ -197,7 +197,7 @@ writeShellApplication {
 
     # Writes the purifier lockfile $3 for yarn.lock $1 with the packages $2,
     # a JSON list. `contentHash` is the SHA-256 of the file's JSON without
-    # it, with keys sorted and no whitespace, as nix/lib/lock.nix computes
+    # it, with keys sorted and no whitespace, as lib-overlays/default/lock.nix computes
     # it.
     writeLock() {
       local body
@@ -367,7 +367,7 @@ writeShellApplication {
           YARN_CLASSIC_PURIFIER_YARN_LOCK="$toolLock" \
           YARN_CLASSIC_PURIFIER_PACKAGE="$package" \
           nix build --impure --no-link --print-out-paths --expr "
-            import ${../../nix/lib}/publish.nix {
+            import ${./.}/publish.nix {
               pkgs = import ${path} {
                 system = \"${stdenv.hostPlatform.system}\";
                 overlays = [ (builtins.getFlake \"path:${../..}\").overlays.default ];
@@ -375,8 +375,8 @@ writeShellApplication {
               src = /. + builtins.getEnv \"YARN_CLASSIC_PURIFIER_SRC\";
               yarnLock = /. + builtins.getEnv \"YARN_CLASSIC_PURIFIER_YARN_LOCK\";
               lockFile = $purifier;
-              node = ${(import ../../nix/lib/sdk-expression.nix nodejs).shell};
-              yarnClassic = ${(import ../../nix/lib/sdk-expression.nix yarnClassic).shell};
+              node = ${(import ./sdk-expression.nix nodejs).shell};
+              yarnClassic = ${(import ./sdk-expression.nix yarnClassic).shell};
               package = builtins.getEnv \"YARN_CLASSIC_PURIFIER_PACKAGE\";
             }
           ")"

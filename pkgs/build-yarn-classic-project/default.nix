@@ -111,10 +111,10 @@ let
       }
     ]
   );
-  # The lock in memory (nix/lib/read-lock.nix). checkLock fails evaluation
+  # The lock in memory (lib-overlays/default/read-lock.nix). checkLock fails evaluation
   # with its problems, each naming the command that fixes it.
   lock = purifier.checkLock (
-    import ./read-lock.nix { inherit lib; } {
+    import ../../lib-overlays/default/read-lock.nix { inherit lib; } {
       inherit src yarnLock lockFile;
       providedNames = inputSelection.names;
       providedVersions = inputSelection.versions;
@@ -122,7 +122,7 @@ let
   );
   downloads = purifier.entriesFor stdenv.hostPlatform.system lock;
 
-  ownPackageSet = import ./workspaces.nix { inherit lib src; };
+  ownPackageSet = import ../../lib-overlays/default/workspaces.nix { inherit lib src; };
   ownPackages = builtins.attrValues ownPackageSet;
 
   defaultSrcFilter =

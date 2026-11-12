@@ -5,13 +5,13 @@
 #
 #   purifier  "yarn-classic-purifier"
 #   entries   the download entries of the purifier library that yarn.lock
-#             and the purifier lockfile lock (nix/lib/lock.nix). Yarn
+#             and the purifier lockfile lock (lib-overlays/default/lock.nix). Yarn
 #             Classic fetches every package on every system, so no entry
 #             carries `systems`. A git entry for a repository with a
 #             `prepare` script carries the entries of the repository's own
 #             yarn.lock in `downloads`.
 #   outputs   the project's packages by name, as { version, dir, bin }
-#             (nix/lib/workspaces.nix)
+#             (lib-overlays/default/workspaces.nix)
 #   problems  why the lockfiles cannot be used, each naming the command
 #             that fixes it
 #
